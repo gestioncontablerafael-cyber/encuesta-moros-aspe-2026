@@ -1,0 +1,12 @@
+SUBIDA A GITHUB
+
+Sube a la RAIZ del repositorio estos archivos y carpetas:
+- app.py
+- requirements.txt
+- README.md
+- supabase_schema.sql
+- .gitignore
+- carpeta .streamlit
+
+NO subas nunca un archivo llamado .streamlit/secrets.toml.
+El archivo secrets.example.toml sí se puede subir: no contiene claves reales.
