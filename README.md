@@ -33,3 +33,9 @@ Las tablas de respuestas no tienen acceso público directo. La encuesta registra
 - Informes totales o por comparsa en CSV, Excel y PDF.
 - Apartado de ayuda para interpretar resultados.
 - Protección de privacidad: no se muestran detalles con menos de 5 respuestas filtradas.
+
+
+## V7
+- Corregido el envío final a Supabase: las respuestas se conservan entre pasos de Streamlit antes de enviarse.
+- Simplificados los nombres de fecha de los actos: solo se muestra día 4, día 7, día 8, día 9 o día 10.
+- Añadida validación previa del perfil festero antes de guardar.

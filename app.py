@@ -85,18 +85,18 @@ ACTOS = {
 }
 
 ACTOS_PREGUNTAS = {
-    "acto_presentacion": "Presentación de Cargos al Alcalde (mar. 4)",
-    "acto_pregon": "Proclamación de Cargos y Pregón (mar. 4)",
+    "acto_presentacion": "Presentación de Cargos al Alcalde (día 4)",
+    "acto_pregon": "Proclamación de Cargos y Pregón (día 4)",
     "acto_bandas": "Entrada de Bandas / Pasacalles Autoridades (día 7)",
-    "acto_retreta": "Retreta (día 7 noche)",
+    "acto_retreta": "Retreta (día 7)",
     "acto_pasacalles": "Pasacalles Festero (día 8)",
     "acto_entrada_mora": "Entrada Mora (día 8)",
-    "acto_guerrilla": "Guerrilla (dom. 9)",
-    "acto_residencia": "Pasacalle y desfile en Residencia de Ancianos (dom. 9)",
-    "acto_misa": "Misa Festera (dom. 9)",
-    "acto_embajada": "Embajada (dom. 9)",
-    "acto_entrada_cristiana": "Entrada Cristiana (lun. 10)",
-    "acto_premios": "Fallo Premios Miguel Iborra y Entrega de Banderas (lun. 10)",
+    "acto_guerrilla": "Guerrilla (día 9)",
+    "acto_residencia": "Pasacalle y desfile en Residencia de Ancianos (día 9)",
+    "acto_misa": "Misa Festera (día 9)",
+    "acto_embajada": "Embajada (día 9)",
+    "acto_entrada_cristiana": "Entrada Cristiana (día 10)",
+    "acto_premios": "Fallo Premios Miguel Iborra y Entrega de Banderas (día 10)",
 }
 
 ACTO_CHOICES = list(ACTOS.values()) + ["Ninguno en particular"]
@@ -323,6 +323,10 @@ def submit_response(answers: dict[str, Any], raw_token: str | None) -> tuple[boo
     sb = get_supabase()
     if sb is None:
         return False, "Supabase no está configurado."
+    required = ["comparsa", "edad", "antiguedad", "cargo"]
+    missing = [key for key in required if not answers.get(key)]
+    if missing:
+        return False, "No se ha podido enviar porque faltan datos generales de la encuesta. Vuelve al primer paso y comprueba comparsa, edad, antigüedad y cargo."
     try:
         token_hash = hash_token(raw_token) if raw_token else None
         result = sb.rpc(
@@ -336,7 +340,9 @@ def submit_response(answers: dict[str, Any], raw_token: str | None) -> tuple[boo
         text = str(exc)
         if "INVALID_OR_USED_TOKEN" in text:
             return False, "La invitación ya se ha utilizado o no es válida."
-        return False, "No se ha podido guardar la respuesta. Revisa la configuración de Supabase."
+        if "MISSING_REQUIRED_SEGMENTATION" in text:
+            return False, "Faltan los datos generales (comparsa, edad, antigüedad o cargo). Vuelve al primer paso y complétalos."
+        return False, "No se ha podido guardar la respuesta en la base de datos. Inténtalo de nuevo."
 
 
 def fetch_all_responses() -> pd.DataFrame:
@@ -483,6 +489,21 @@ def survey_footer() -> None:
 def init_survey_state() -> None:
     st.session_state.setdefault("survey_step", 0)
     st.session_state.setdefault("survey_done", False)
+    st.session_state.setdefault("survey_answers", {})
+
+
+def persist_answers(*keys: str) -> None:
+    """Guarda respuestas fuera del ciclo de vida de los widgets de Streamlit."""
+    store = st.session_state.setdefault("survey_answers", {})
+    for key in keys:
+        if key in st.session_state:
+            store[key] = st.session_state.get(key)
+
+
+def saved_answer(key: str, default: Any = None) -> Any:
+    if key in st.session_state:
+        return st.session_state.get(key)
+    return st.session_state.get("survey_answers", {}).get(key, default)
 
 
 def nav_buttons(previous: bool = True, next_label: str = "Siguiente", disabled: bool = False) -> tuple[bool, bool]:
@@ -567,6 +588,7 @@ def render_survey() -> None:
             if not all(required):
                 st.error("Completa las preguntas obligatorias para continuar.")
             else:
+                persist_answers("comparsa", "edad", "antiguedad", "cargo", "cargo_otro")
                 st.session_state.survey_step = 2
                 st.rerun()
 
@@ -595,6 +617,7 @@ def render_survey() -> None:
             if st.session_state.get("valoracion_general") is None or not st.session_state.get("evolucion"):
                 st.error("Completa las dos preguntas para continuar.")
             else:
+                persist_answers("valoracion_general", "evolucion")
                 st.session_state.survey_step = 3
                 st.rerun()
 
@@ -619,6 +642,7 @@ def render_survey() -> None:
             else:
                 for k in groups[step]:
                     st.session_state[k] = normalize_rating(st.session_state.get(k + "_ui"))
+                persist_answers(*groups[step])
                 st.session_state.survey_step = step + 1
                 st.rerun()
 
@@ -646,6 +670,7 @@ def render_survey() -> None:
                 st.error("Para continuar, ordena los 12 actos.")
             else:
                 st.session_state["ranking_actos"] = ranking
+                persist_answers("ranking_actos")
                 st.session_state.survey_step = 8
                 st.rerun()
 
@@ -670,6 +695,7 @@ def render_survey() -> None:
             if not st.session_state.get("acto_destaca") or not st.session_state.get("acto_mejorar") or not st.session_state.get("cantidad_actos"):
                 st.error("Completa las preguntas obligatorias para continuar.")
             else:
+                persist_answers("acto_destaca", "acto_destaca_por_que", "acto_mejorar", "acto_mejorar_que_cambiarias", "cantidad_actos")
                 st.session_state.survey_step = 9
                 st.rerun()
 
@@ -702,6 +728,7 @@ def render_survey() -> None:
                     st.session_state["pulsera_utilidad"] = None
                     st.session_state["pulsera_valoracion"] = None
                     st.session_state["pulsera_mejoras"] = ""
+                persist_answers("pulsera_usada", "pulsera_utilidad", "pulsera_valoracion", "pulsera_mejoras")
                 st.session_state.survey_step = 10
                 st.rerun()
 
@@ -723,6 +750,7 @@ def render_survey() -> None:
             if not st.session_state.get("pasacalles_preferencia"):
                 st.error("Selecciona una opción para continuar.")
             else:
+                persist_answers("pasacalles_preferencia", "pasacalles_motivo")
                 st.session_state.survey_step = 11
                 st.rerun()
 
@@ -744,6 +772,7 @@ def render_survey() -> None:
             if not st.session_state.get("media_fiesta_preferencia"):
                 st.error("Selecciona una opción para continuar.")
             else:
+                persist_answers("media_fiesta_preferencia", "media_fiesta_comentarios")
                 st.session_state.survey_step = 12
                 st.rerun()
 
@@ -788,7 +817,8 @@ def collect_answers() -> dict[str, Any]:
         "media_fiesta_preferencia", "media_fiesta_comentarios",
         "recomendacion", "mejoras_2027", "comentario_final",
     ]
-    return {k: st.session_state.get(k) for k in keys}
+    persist_answers("recomendacion", "mejoras_2027", "comentario_final")
+    return {k: saved_answer(k) for k in keys}
 
 # =============================================================
 # ADMIN / PANEL
