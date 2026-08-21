@@ -1,12 +1,7 @@
-SUBIDA A GITHUB
-
-Sube a la RAIZ del repositorio estos archivos y carpetas:
-- app.py
-- requirements.txt
-- README.md
-- supabase_schema.sql
-- .gitignore
-- carpeta .streamlit
-
-NO subas nunca un archivo llamado .streamlit/secrets.toml.
-El archivo secrets.example.toml sí se puede subir: no contiene claves reales.
+1. Descomprime el ZIP.
+2. GitHub > repositorio encuesta-moros-aspe-2026.
+3. Add file > Upload files.
+4. Arrastra TODOS los archivos y carpetas de esta carpeta.
+5. Commit changes.
+6. En Streamlit: Create app > repositorio > main > app.py > Deploy.
+7. Esta versión NO necesita configurar Secrets.
