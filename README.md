@@ -9,8 +9,10 @@ La encuesta se ha diseñado como anónima: no pide nombre, apellidos, DNI, email
 
 ## Qué incluye
 
-- 8 comparsas: Sulayman, Alcana, Maqueda, Lanceros, Estudiantes, Aljau, Contrabandistas y Fauquies.
+- 8 comparsas: Moros Alcaná, Moros Aljau, Moros Fauquíes, Moros Sulaymán, Cristianos Contrabandistas de la Sierra Negra, Cristianos Duque de Maqueda, Cristianos Estudiantes y Cristianos Lanceros de Uchel.
 - Perfil festero: comparsa, edad, antigüedad y cargo/responsabilidad.
+- Escudo de la Unión de Moros y Cristianos visible en la encuesta y el acceso de Junta Directiva.
+- Todas las respuestas de texto libre son opcionales y pueden dejarse en blanco.
 - Valoración general 1–5.
 - Valoración de 12 actos, con `No asistí / No puedo valorarlo` guardado como valor nulo y nunca como cero.
 - Acto mejor valorado y acto a revisar.

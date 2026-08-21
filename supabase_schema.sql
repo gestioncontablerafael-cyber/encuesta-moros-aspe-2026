@@ -45,14 +45,14 @@ create table if not exists public.comparsa_config (
 
 insert into public.comparsa_config (comparsa, invited_count)
 values
-('SULAYMAN', 0),
-('ALCANA', 0),
-('MAQUEDA', 0),
-('LANCEROS', 0),
-('ESTUDIANTES', 0),
-('ALJAU', 0),
-('CONTRABANDISTAS', 0),
-('FAUQUIES', 0)
+('Moros Alcaná', 0),
+('Moros Aljau', 0),
+('Moros Fauquíes', 0),
+('Moros Sulaymán', 0),
+('Cristianos Contrabandistas de la Sierra Negra', 0),
+('Cristianos Duque de Maqueda', 0),
+('Cristianos Estudiantes', 0),
+('Cristianos Lanceros de Uchel', 0)
 on conflict (comparsa) do nothing;
 
 -- 4) RLS: no damos acceso directo a anon/authenticated.

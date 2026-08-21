@@ -19,16 +19,17 @@ from supabase import Client, create_client
 
 APP_TITLE = "Encuesta · Moros y Cristianos de Aspe 2026"
 ORG_NAME = "Unión de Moros y Cristianos Virgen de las Nieves · Junta Central"
+LOGO_PATH = "assets/escudo_union_moros_cristianos.jpg"
 
 COMPARSAS = [
-    "SULAYMAN",
-    "ALCANA",
-    "MAQUEDA",
-    "LANCEROS",
-    "ESTUDIANTES",
-    "ALJAU",
-    "CONTRABANDISTAS",
-    "FAUQUIES",
+    "Moros Alcaná",
+    "Moros Aljau",
+    "Moros Fauquíes",
+    "Moros Sulaymán",
+    "Cristianos Contrabandistas de la Sierra Negra",
+    "Cristianos Duque de Maqueda",
+    "Cristianos Estudiantes",
+    "Cristianos Lanceros de Uchel",
 ]
 
 EDADES = [
@@ -74,10 +75,10 @@ ACTOS = {
 ACTOS_PREGUNTAS = {
     "acto_presentacion": "Presentación de Cargos al Alcalde (mar. 4)",
     "acto_pregon": "Proclamación de Cargos y Pregón (mar. 4)",
-    "acto_bandas": "Entrada de Bandas / Pasacalles Autoridades (vie. 7)",
-    "acto_retreta": "Retreta (vie. 7 noche)",
-    "acto_pasacalles": "Pasacalles Festero (sáb. 8)",
-    "acto_entrada_mora": "Entrada Mora (sáb. 8)",
+    "acto_bandas": "Entrada de Bandas / Pasacalles Autoridades (día 7)",
+    "acto_retreta": "Retreta (día 7 noche)",
+    "acto_pasacalles": "Pasacalles Festero (día 8)",
+    "acto_entrada_mora": "Entrada Mora (día 8)",
     "acto_guerrilla": "Guerrilla (dom. 9)",
     "acto_residencia": "Pasacalle y desfile en Residencia de Ancianos (dom. 9)",
     "acto_misa": "Misa Festera (dom. 9)",
@@ -481,6 +482,9 @@ def create_invite_links(comparsa: str, quantity: int, base_url: str) -> tuple[bo
 
 def survey_header(step: int | None = None) -> None:
     st.markdown('<div class="survey-shell">', unsafe_allow_html=True)
+    logo_left, logo_center, logo_right = st.columns([1.6, 1, 1.6])
+    with logo_center:
+        st.image(LOGO_PATH, width=185)
     st.markdown(
         f"""
         <div class="hero">
@@ -561,7 +565,7 @@ def render_survey() -> None:
                 <div class="section-kicker">Bienvenida</div>
                 <h2>Tu opinión nos ayuda a mejorar</h2>
                 <p>Queremos conocer tu valoración sobre los actos celebrados en 2026 y tu opinión sobre posibles cambios de cara a 2027.</p>
-                <div class="privacy-note"><strong>La encuesta es anónima.</strong> No se solicita nombre, email, DNI ni teléfono. Los comentarios abiertos son opcionales.</div>
+                <div class="privacy-note"><strong>La encuesta es anónima.</strong> No se solicita nombre, email, DNI ni teléfono. <strong>Todas las respuestas que requieren escribir texto son opcionales:</strong> puedes dejarlas en blanco y continuar.</div>
                 <p class="small-muted">Duración aproximada: 5–7 minutos.</p>
             </div>
             """,
@@ -582,7 +586,7 @@ def render_survey() -> None:
         st.selectbox("¿Cuántos años llevas participando en las Fiestas? *", ANTIGUEDADES, key="antiguedad", index=None, placeholder="Selecciona una opción")
         st.selectbox("¿Has desempeñado algún cargo o responsabilidad festera durante las Fiestas 2026? *", CARGOS, key="cargo", index=None, placeholder="Selecciona una opción")
         if st.session_state.get("cargo") == "Otro":
-            st.text_input("Si quieres, indica cuál", key="cargo_otro")
+            st.text_input("Si quieres, indica cuál (opcional)", key="cargo_otro")
         back, nxt = nav_buttons()
         if back:
             st.session_state.survey_step = 0
@@ -650,9 +654,9 @@ def render_survey() -> None:
     elif step == 7:
         st.markdown('<div class="section-kicker">3 · Conclusiones sobre los actos</div><h2>¿Qué destacarías y qué revisarías?</h2>', unsafe_allow_html=True)
         st.selectbox("¿Qué acto destacarías especialmente de forma positiva? *", ACTO_CHOICES, key="acto_destaca", index=None, placeholder="Selecciona una opción")
-        st.text_area("Si quieres, cuéntanos brevemente por qué", key="acto_destaca_por_que", height=100)
+        st.text_area("Si quieres, cuéntanos brevemente por qué (opcional)", key="acto_destaca_por_que", height=100)
         st.selectbox("¿Qué acto consideras que debería revisarse o mejorarse especialmente? *", ACTO_CHOICES, key="acto_mejorar", index=None, placeholder="Selecciona una opción")
-        st.text_area("Si quieres, dinos qué cambiarías", key="acto_mejorar_que_cambiarias", height=100)
+        st.text_area("Si quieres, dinos qué cambiarías (opcional)", key="acto_mejorar_que_cambiarias", height=100)
         st.selectbox(
             "Pensando en el conjunto de las Fiestas, ¿qué opinas de la cantidad de actos? *",
             ["Hay demasiados actos", "La cantidad de actos es adecuada", "Se podrían añadir más actos", "No tengo una opinión clara"],
@@ -683,7 +687,7 @@ def render_survey() -> None:
                 placeholder="Selecciona una opción",
             )
             st.radio("En una escala del 1 al 5, ¿cómo valorarías la pulsera festera en general? *", [1,2,3,4,5], horizontal=True, key="pulsera_valoracion", index=None)
-            st.text_area("¿Qué mejorarías de la pulsera festera?", key="pulsera_mejoras", help="Material, proceso de entrega, funcionalidad, accesos u otros aspectos.", height=100)
+            st.text_area("¿Qué mejorarías de la pulsera festera? (opcional)", key="pulsera_mejoras", help="Puedes dejar esta respuesta en blanco y continuar.", height=100)
         back, nxt = nav_buttons()
         if back:
             st.session_state.survey_step = 7
@@ -705,14 +709,14 @@ def render_survey() -> None:
 
     elif step == 9:
         st.markdown('<div class="section-kicker">5 · Pasacalles Festero</div><h2>Posible cambio de día</h2>', unsafe_allow_html=True)
-        st.info("Actualmente el Pasacalles Festero se celebra el sábado 8 de agosto. Se plantea la posibilidad de trasladarlo al viernes 7 de agosto.")
+        st.info("Actualmente el Pasacalles Festero se celebra el día 8 de agosto. Se plantea la posibilidad de trasladarlo al día 7 de agosto.")
         st.radio(
             "¿Qué opción prefieres? *",
             ["Prefiero que pase a celebrarse el día 7", "Prefiero que se mantenga el día 8", "Me resulta indiferente"],
             key="pasacalles_preferencia",
             index=None,
         )
-        st.text_area("Si quieres, explica brevemente el motivo de tu respuesta", key="pasacalles_motivo", height=110)
+        st.text_area("Si quieres, explica brevemente el motivo de tu respuesta (opcional)", key="pasacalles_motivo", height=110)
         back, nxt = nav_buttons()
         if back:
             st.session_state.survey_step = 8
@@ -733,7 +737,7 @@ def render_survey() -> None:
             key="media_fiesta_preferencia",
             index=None,
         )
-        st.text_area("Sugerencias o comentarios sobre la Media Fiesta 2027", key="media_fiesta_comentarios", height=110)
+        st.text_area("Sugerencias o comentarios sobre la Media Fiesta 2027 (opcional)", key="media_fiesta_comentarios", height=110)
         back, nxt = nav_buttons()
         if back:
             st.session_state.survey_step = 9
@@ -752,12 +756,12 @@ def render_survey() -> None:
             0, 10, key="recomendacion",
         )
         st.text_area(
-            "¿Qué mejorarías de cara a las Fiestas 2027?",
+            "¿Qué mejorarías de cara a las Fiestas 2027? (opcional)",
             key="mejoras_2027",
             help="Puedes hablarnos de actos, horarios, organización, desfiles, pulsera, convivencia, servicios o cualquier otro aspecto que consideres importante.",
             height=125,
         )
-        st.text_area("¿Hay alguna propuesta o comentario que no te hayamos preguntado y quieras trasladar a la Junta Central?", key="comentario_final", height=125)
+        st.text_area("¿Hay alguna propuesta o comentario que no te hayamos preguntado y quieras trasladar a la Junta Central? (opcional)", key="comentario_final", height=125)
         back, nxt = nav_buttons(next_label="ENVIAR ENCUESTA")
         if back:
             st.session_state.survey_step = 10
@@ -797,6 +801,9 @@ def admin_authenticated() -> bool:
 
 
 def render_admin_login() -> bool:
+    admin_logo_left, admin_logo_center, admin_logo_right = st.columns([2, 1, 2])
+    with admin_logo_center:
+        st.image(LOGO_PATH, width=150)
     st.markdown("## Acceso Junta Directiva")
     st.caption("Área privada de resultados y gestión de la encuesta.")
     with st.form("admin_login"):
