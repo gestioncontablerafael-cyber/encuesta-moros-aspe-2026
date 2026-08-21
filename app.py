@@ -1036,10 +1036,6 @@ def render_admin() -> None:
 
     st.caption(f"Datos en tiempo real · Última actualización: {datetime.now():%d/%m/%Y %H:%M}")
     filtered = top_filters(df)
-    min_group = 5
-    if len(filtered) < min_group:
-        st.warning(f"Por privacidad, no se muestran detalles cuando el filtro deja menos de {min_group} respuestas.")
-        return
 
     invited = get_invited_counts()
     total_invited = sum(invited.values())
@@ -1142,8 +1138,8 @@ def render_admin() -> None:
         st.markdown("### Generar informes para la Junta Directiva")
         scope=st.selectbox("Ámbito del informe",["TOTAL"]+COMPARSAS)
         report_df=df if scope=="TOTAL" else df[df['comparsa']==scope]
-        if len(report_df)<min_group:
-            st.warning("No se genera un informe detallado con menos de 5 respuestas, para proteger la privacidad.")
+        if report_df.empty:
+            st.info("No hay respuestas disponibles para este ámbito.")
         else:
             for pt in interpretation_points(report_df,invited): st.markdown(f"- {pt}")
             csv=report_df.drop(columns=['id'],errors='ignore').to_csv(index=False).encode('utf-8-sig')
@@ -1191,7 +1187,7 @@ def render_admin() -> None:
         st.markdown("**Actos.** Conviene cruzar tres datos: valoración media, número de personas que lo han valorado y su posición en la pregunta de ordenación. Un acto con alta nota pero poca participación debe interpretarse con cautela.")
         st.markdown("**Comparsas.** Las diferencias entre comparsas pueden revelar necesidades distintas. No deben utilizarse para establecer juicios sobre una comparsa, sino para detectar patrones y adaptar decisiones.")
         st.markdown("**Comentarios abiertos.** Sirven para explicar el porqué de los porcentajes. Busca temas repetidos, no comentarios aislados.")
-        st.markdown("**Privacidad.** El panel oculta el detalle cuando un filtro deja menos de 5 respuestas. Los informes son agregados y no incluyen datos identificativos directos.")
+        st.markdown("**Privacidad.** La encuesta no solicita nombre, DNI, email ni teléfono. El panel privado de la Junta permite analizar todas las respuestas y aplicar cualquier filtro disponible.")
         st.markdown("### Lectura automática de los datos actuales")
         for pt in interpretation_points(filtered,invited): st.markdown(f"- {pt}")
 
